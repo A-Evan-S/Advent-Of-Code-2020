@@ -1,3 +1,5 @@
+import time
+
 def main():
     input = []
     with open('day15_input.txt') as f:
@@ -24,6 +26,26 @@ def find_nth_number(input, n):
             next_number = curr_time - old_time
         curr_time += 1
         if curr_time == n - 1:
+            return next_number
+
+def find_nth_number_alt(input, n):
+    nums = input[0].split(',')
+    prev_nums = [0 for _ in range(n)]
+    curr_time = 1
+    for num in nums:
+        prev_nums[int(num)] = curr_time
+        curr_time += 1
+    next_number = 0
+    while True:
+        if not prev_nums[next_number]:
+            prev_nums[next_number] = curr_time
+            next_number = 0
+        else:
+            old_time = prev_nums[next_number]
+            prev_nums[next_number] = curr_time
+            next_number = curr_time - old_time
+        curr_time += 1
+        if curr_time == n:
             return next_number
 
 def part1(input):
