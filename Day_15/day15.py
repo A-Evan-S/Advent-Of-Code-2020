@@ -36,15 +36,14 @@ def find_nth_number(input, n):
         prev_nums[int(num)] = curr_time
         curr_time += 1
     next_number = 0
-    while curr_time < n:
+    for time in range(curr_time,n):
         if not prev_nums[next_number]:
-            prev_nums[next_number] = curr_time
+            prev_nums[next_number] = time
             next_number = 0
         else:
             old_time = prev_nums[next_number]
-            prev_nums[next_number] = curr_time
-            next_number = curr_time - old_time
-        curr_time += 1
+            prev_nums[next_number] = time
+            next_number = time - old_time
     return next_number
 
 def part1(input):
