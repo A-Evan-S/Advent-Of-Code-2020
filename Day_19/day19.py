@@ -27,7 +27,7 @@ class Rule:
         valid_messages = []
         for message in messages:
             if self.type == 'letter':
-                if self.letter in message and message.index(self.letter) == 0:
+                if message.find(self.letter) == 0:
                     valid_messages.append(message[1:])
             else:
                 for option in self.rule_options:
@@ -37,12 +37,10 @@ class Rule:
                         valid, new_messages = rules[rule].check_valid(new_messages, rules)
                         if not valid:
                             option_valid = False
+                            break
                     if option_valid:
                         valid_messages.extend(new_messages)
-        if len(valid_messages) > 0:
-            return True, valid_messages
-        else:
-            return False, []
+        return len(valid_messages) > 0, valid_messages
 
 def solve_helper(message, rules):
     valid, remaining = rules[0].check_valid([message], rules)
@@ -57,8 +55,8 @@ def solve(input, part2=False):
 
     if part2:
         max_rec = 10
-        rules[8] = Rule('|'.join(['42 ' * i for i in range(1, max_rec)]))
-        rules[11] = Rule('|'.join(['42 ' * i + ' 31' * i for i in range(1, max_rec)]))
+        rules[8] = Rule('|'.join(['42 '*i for i in range(1, max_rec)]))
+        rules[11] = Rule('|'.join(['42 '*i + '31 '*i for i in range(1, max_rec)]))
 
     return len(list(filter(lambda m: solve_helper(m, rules), messages.split('\n'))))
 
