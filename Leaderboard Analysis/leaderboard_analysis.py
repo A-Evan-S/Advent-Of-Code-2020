@@ -1,7 +1,5 @@
 import json
-import time
 import datetime
-from pytz import timezone
 
 def main():
     with open('leaderboard.json') as f:
