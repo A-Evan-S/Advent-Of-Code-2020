@@ -54,7 +54,7 @@ def solve(input, part2=False):
         rules[int(rule_num)] = Rule(rule_text)
 
     if part2:
-        max_rec = 10
+        max_rec = 6
         rules[8] = Rule('|'.join(['42 '*i for i in range(1, max_rec)]))
         rules[11] = Rule('|'.join(['42 '*i + '31 '*i for i in range(1, max_rec)]))
 
