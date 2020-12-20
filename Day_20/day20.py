@@ -1,5 +1,9 @@
+import copy
+import math
+import re
+
 from aoc_utils import timed
-import math, copy
+
 
 def main():
     with open('day20_input.txt') as f:
@@ -49,7 +53,7 @@ def swap(image, r1, c1, r2, c2):
 class Frame:
     def __init__(self, text):
         rows = text.split('\n')
-        self.frame_num = int(rows[0][5:9])
+        self.frame_num = int(re.search(r'\d+', rows[0]).group())
         self.pixels = [[x for x in row] for row in rows[1:]]
         self.size = len(self.pixels)
 
@@ -167,6 +171,14 @@ def find_monsters(image):
                             image[row + r][col + c] = '0'
 
     return num_monsters, image
+
+def find_monsters_alt(image):
+    with open('monster.txt') as f:
+        monster = [[x for x in row.strip('\n')] for row in f.readlines()]
+
+    monster = ''.join([''.join(row) for row in monster])
+
+    print(monster)
 
 if __name__ == '__main__':
     main()
