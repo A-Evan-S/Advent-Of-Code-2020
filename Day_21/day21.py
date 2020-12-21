@@ -1,5 +1,5 @@
 from aoc_utils import timed
-import re
+import re, copy
 
 def main():
     input = []
@@ -9,74 +9,53 @@ def main():
     print("Part 1:", timed(part1, input))
     print("Part 2:", timed(part2, input))
 
+
 def part1(input):
-    safe = find_safe(input)
-    count = 0
+    recipes, ingredients, allergens = parse_recipes(input)
+    possible_allergens = find_possible_allergens(recipes, ingredients, allergens)
+    safe = list(map(lambda x: x[0], filter(lambda e: e[1] == [], possible_allergens.items())))
+    return sum(recipe[0].count(safe_ingredient) for safe_ingredient in safe for recipe in recipes)
+
+
+def parse_recipes(input):
+    recipes = []
+    all_ingredients = set()
+    all_allergens = set()
     for line in input:
-        ing, al = line.split('(')
-        ing = re.findall('\w+', ing)
-        for ingredient in ing:
-            if ingredient in safe:
-                count += 1
+        ingredient_text, allergen_text = line.split('(contains ')
+        ingredients = re.findall('\w+', ingredient_text)
+        allergens = list(map(lambda x: x.strip(), allergen_text[:-1].split(', ')))
+        recipes.append([ingredients, allergens])
+        all_ingredients.update(ingredients)
+        all_allergens.update(allergens)
+    return recipes, list(all_ingredients), list(all_allergens)
 
-    return count
 
-def find_safe(input):
-    ingredients = set()
-    allergens = set()
-    for line in input:
-        ing, al = line.split('(')
-        ingredients.update(re.findall('\w+', ing))
-        allergens.update(list(map(lambda x: x.strip(), al[8:-1].split(', '))))
-
+def find_possible_allergens(recipes, ingredients, allergens):
     ingredients_map = {}
     for ingredient in ingredients:
-        ingredients_map[ingredient] = list(allergens)
+        ingredients_map[ingredient] = copy.deepcopy(allergens)
 
-    for line in input:
-        ing, al = line.split('(')
-        ing = re.findall('\w+', ing)
-        al = list(map(lambda x: x.strip(), al[8:-1].split(', ')))
-        for allergen in al:
+    for recipe in recipes:
+        for allergen in recipe[1]:
             for ingredient in ingredients_map.keys():
-                if ingredient not in ing and (allergen in ingredients_map[ingredient]):
+                if ingredient not in recipe[0] and (allergen in ingredients_map[ingredient]):
                     ingredients_map[ingredient].remove(allergen)
 
-    safe = []
+    return ingredients_map
 
-    for ingredient in ingredients_map.keys():
-        if ingredients_map[ingredient] == []:
-            safe.append(ingredient)
-    return safe
 
 def part2(input):
-    safe = find_safe(input)
-    lines = []
-    ingredients = set()
-    allergens = set()
-    for line in input:
-        ing, al = line.split('(')
-        ing = re.findall('\w+', ing)
-        al = list(map(lambda x: x.strip(), al[8:-1].split(', ')))
-        lines.append([ing, al])
-        ingredients.update(ing)
-        allergens.update(al)
+    recipes, ingredients, allergens = parse_recipes(input)
+    possible_allergens = find_possible_allergens(recipes, ingredients, allergens)
+    possible_allergens = dict(filter(lambda e: len(e[1]) > 0, possible_allergens.items()))
+    ingredients = list(possible_allergens.keys())
 
-    ingredients = list(filter(lambda x: x not in safe, ingredients))
-    allergens = list(allergens)
+    arr = [[False for _ in range(len(ingredients))] for _ in range(len(allergens))]
 
-    #remove known safe ingredients
-    for line in lines:
-        line[0] = list(filter(lambda x: x not in safe, line[0]))
-
-    arr = [[True for _ in range(len(ingredients))] for _ in range(len(allergens))]
-
-    for line in lines:
-        for allergen in line[1]:
-            for i in range(len(ingredients)):
-                if ingredients[i] not in line[0]:
-                    arr[allergens.index(allergen)][i] = False
-
+    for ing, als in possible_allergens.items():
+        for al in als:
+            arr[allergens.index(al)][ingredients.index(ing)] = True
 
     old_count = sum([row.count(True) for row in arr])
     new_count = 0
@@ -100,8 +79,7 @@ def part2(input):
 
     ingredients = sorted(ingredients, key=lambda ing: ing[1])
 
-    answer = ','.join(ing[0] for ing in ingredients)
-    return answer
+    return ','.join(ing[0] for ing in ingredients)
 
 if __name__ == '__main__':
     main()
