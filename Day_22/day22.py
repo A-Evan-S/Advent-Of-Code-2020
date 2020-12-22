@@ -40,7 +40,11 @@ def score(hand):
     return sum(hand[i] * (len(hand) - i) for i in range(len(hand)))
 
 
-def play_recursive(p1_hand, p2_hand):
+def play_recursive(p1_hand, p2_hand, top_level=True):
+    # Skip easily provable win scenarios
+    if not top_level and 50 in p1_hand:
+        return 1
+
     prev_hands = set()
     while len(p1_hand) > 0 and len(p2_hand) > 0:
         if str(p1_hand) + '|' + str(p2_hand) in prev_hands:
@@ -53,7 +57,7 @@ def play_recursive(p1_hand, p2_hand):
         if len(p1_hand) >= card1 and len(p2_hand) >= card2:
             p1_hand_copy = copy.deepcopy(p1_hand[:card1])
             p2_hand_copy = copy.deepcopy(p2_hand[:card2])
-            winner = play_recursive(p1_hand_copy, p2_hand_copy)
+            winner = play_recursive(p1_hand_copy, p2_hand_copy, False)
             if winner == 1:
                 p1_hand.extend([card1, card2])
             else:  # winner == 2
