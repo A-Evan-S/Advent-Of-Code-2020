@@ -10,13 +10,11 @@ def main():
     print("Part 1:", timed(part1, input))
     print("Part 2:", timed(part2, input))
 
-
 def part1(input):
     recipes = parse_recipes(input)
     possible_allergens = find_possible_allergens(recipes)
     safe = list(map(lambda x: x[0], filter(lambda e: len(e[1]) == 0, possible_allergens.items())))
     return sum(recipe[0].count(safe_ingredient) for safe_ingredient in safe for recipe in recipes)
-
 
 def part2(input):
     recipes = parse_recipes(input)
@@ -33,11 +31,10 @@ def parse_recipes(input):
     recipes = []
     for line in input:
         ingredient_text, allergen_text = line.split('(contains ')
-        ingredients = re.findall('\w+', ingredient_text)
+        ingredients = re.findall(r'\w+', ingredient_text)
         allergens = list(map(lambda x: x.strip(), allergen_text[:-1].split(', ')))
         recipes.append([ingredients, allergens])
     return recipes
-
 
 def find_possible_allergens(recipes):
     ingredients_map = defaultdict(lambda: set())
