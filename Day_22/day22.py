@@ -44,6 +44,8 @@ def play_recursive(p1_hand, p2_hand, top_level=True):
     # Skip easily provable win scenarios
     if not top_level and 50 in p1_hand:
         return 1
+    elif not top_level and 50 in p2_hand:
+        return 2
 
     prev_hands = set()
     while len(p1_hand) > 0 and len(p2_hand) > 0:
